@@ -25,12 +25,11 @@ def data_analisis(request):
         number_of_phones = datas.filter(Q(apparat_id=apparats[1].apparat_id) & Q(packet_time__gt = t) & Q(packet_time__lte = t+300)).count()
         Phone.objects.create(apparat=apparats[1], device_count=number_of_phones, counted_at=datetime.fromtimestamp(t+300))
 
-    return HttpResponse(f"ma'lumotlar analiz qilindi")
+    return HttpResponse("ma'lumotlar analiz qilindi")
 
 
 def data_analisis_result(request):
     apparats = Apparat.objects.all()
-    phones = Phone.objects.all()
     result = {}
     
 
@@ -45,5 +44,8 @@ def data_analisis_result(request):
 
 def get_one_data(request, apparat_id, counted_at):
 
-    data = Phone.objects.get(apparat__apparat_id=apparat_id, counted_at=counted_at)
-    return JsonResponse({"apparat_id":apparat_id, 'counted_at':counted_at, 'count':data.device_count})
+    try:
+        data = Phone.objects.get(apparat__apparat_id=apparat_id, counted_at=counted_at)
+        return JsonResponse({"apparat_id":apparat_id, 'counted_at':counted_at, 'count':data.device_count})
+    except:
+        return JsonResponse({'message':"Bu parametrlar bo'yicha ma'lumot topilmadi"})
